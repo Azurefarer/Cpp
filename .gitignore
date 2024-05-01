@@ -1,4 +1,4 @@
-/physics_simulations/build
-/helloworld_build
+build/
 /cmake-3.29.2-tutorial-source
 /.vscode
+.DS_Store
