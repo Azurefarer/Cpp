@@ -1,4 +1,3 @@
-
 #ifndef SHADER_H
 #define SHADER_H
 
@@ -40,6 +39,7 @@ public:
             // convert stream into string
             vertexCode = vShaderStream.str();
             fragmentCode = fShaderStream.str();
+            // std::cout << vertexCode + fragmentCode << std::endl;
         }
         catch (std::ifstream::failure& e)
         {
@@ -68,6 +68,7 @@ public:
         // delete the shaders as they're linked into our program now and no longer necessary
         glDeleteShader(vertex);
         glDeleteShader(fragment);
+        std::cout << "Shader instance success." << std::endl;
     }
     // activate the shader
     // ------------------------------------------------------------------------

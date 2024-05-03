@@ -36,9 +36,20 @@ int exercises()
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
+	
+	std::cout << "divided by zero I think" << "\n" << std::endl;
+	Shader our_shader_01
+	(
+		"C:\\Users\\benji\\Workspace\\Cpp\\physics_simulations\\src\\shader_source\\vertex_shader_practice.vs", 
+		"C:\\Users\\benji\\Workspace\\Cpp\\physics_simulations\\src\\shader_source\\fragment_shader_01_practice.fs"
+	);
+	std::cout << "made it here in the program :D" << std::endl;
 
-	Shader ourShader_01("./Shader_Source/Vertex_Shader_Practice.vs", "./Shader_Source/Fragment_Shader_01_Practice.fs");
-	Shader ourShader_02("./Shader_Source/Vertex_Shader_Practice.vs", "./Shader_Source/Fragment_Shader_02_Practice.fs");
+	Shader our_shader_02
+	(
+		"C:\\Users\\benji\\Workspace\\Cpp\\physics_simulations\\src\\shader_source\\vertex_shader_practice.vs",
+		"C:\\Users\\benji\\Workspace\\Cpp\\physics_simulations\\src\\shader_source\\fragment_shader_02_practice.fs"
+	);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -140,9 +151,9 @@ int exercises()
 
 	stbi_image_free(data2);
 
-	ourShader_01.use(); // don't forget to activate the shader before setting uniforms!  
-	glUniform1i(glGetUniformLocation(ourShader_01.ID, "texture01"), 0); // set it manually
-	ourShader_01.setInt("texture02", 1); // or with shader class
+	our_shader_01.use(); // don't forget to activate the shader before setting uniforms!  
+	glUniform1i(glGetUniformLocation(our_shader_01.ID, "texture01"), 0); // set it manually
+	our_shader_01.setInt("texture02", 1); // or with shader class
 
 
 	while (!glfwWindowShouldClose(window))
@@ -158,14 +169,14 @@ int exercises()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture02);
 
-		ourShader_01.use();
+		our_shader_01.use();
 		glBindVertexArray(VAOs[0]);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
+	// glDeleteProgram(our_shader_01.ID);
 	glDeleteVertexArrays(1, &VAOs[0]);
 	glDeleteVertexArrays(1, &VAOs[1]);
 	glDeleteBuffers(1, &VBOs[0]);
@@ -175,3 +186,7 @@ int exercises()
 	glfwTerminate();
 	return 0;
 }
+
+
+
+
