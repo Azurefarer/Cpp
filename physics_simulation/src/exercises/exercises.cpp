@@ -9,8 +9,8 @@
 
 
 // settings
-static unsigned int SCR_WIDTH = 192;
-static unsigned int SCR_HEIGHT = 108;
+static unsigned int SCR_WIDTH = 1920;
+static unsigned int SCR_HEIGHT = 1080;
 
 // GLSL source code
 // Moved into their own files, accessed by Shader_Class now
@@ -82,61 +82,26 @@ int exercises()
 	gen_gl_objs(VAO, VBO);
 
 	// first triangle setup
-	// --------------------
-	std::cout << "size of &vertices1: " << sizeof(&vertices1) << std::endl;
-	std::cout << "size of vertices1: " << sizeof(vertices1) << std::endl;
 	bind_gl_objs(VAO, VBO, vertices1);	
-	// glBindVertexArray(VAO[0]);
-	// glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-
-	// glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);
 	vert_attrib_pointer_config();
 
-	// // position attribute
-	// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	// glEnableVertexAttribArray(0);
-	// // color attribute
-	// glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	// glEnableVertexAttribArray(0);
-	// // texture attribute
-	// glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	// glEnableVertexAttribArray(2);
-	
 	unsigned int EBO[1] = {0};
-	// write_to_element_buffer(EBO, indices);
-
-	glGenBuffers(1, EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	// second triangle setup
-	// ---------------------
-	// bind_gl_objs(VAO[1], VBO[1], vertices2);
-
-	// glBindVertexArray(VAO[1]);	// note that we bind to a different VAO now
-	// glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);	// and a different VBO
-	// glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
-	// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); // because the vertex data is tightly packed we can also specify 0 as the vertex attribute's stride to let OpenGL figure it out
-	// glEnableVertexAttribArray(0);
-	// glBindVertexArray(0); 
-	// not really necessary as well, but beware of calls that could affect VAOs while this one is bound 
-	// (like binding element buffer objects, or enabling/disabling vertex attributes)
+	write_to_element_buffer(EBO, indices);
 
 	// Texture stuff
-	unsigned int texture01 = 0, texture02 = 0;
+	unsigned int tex01 = 0, tex02 = 0;
 	// texture 1
 	// ---------
-	glGenTextures(1, &texture01);
-	glBindTexture(GL_TEXTURE_2D, texture01);
+	glGenTextures(1, &tex01);
+	glBindTexture(GL_TEXTURE_2D, tex01);
 	// set the texture wrapping parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	// set texture filtering parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	int width, height, nrChannels;
+	int width = 0, height = 0, nrChannels = 0;
 	unsigned char *data1 = stbi_load("../src/container.jpg", &width, &height, &nrChannels, 0);
-	glBindTexture(GL_TEXTURE_2D, texture01);
 	if (data1)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data1);
@@ -148,9 +113,9 @@ int exercises()
 	}
 	stbi_image_free(data1);
 
-	glGenTextures(1, &texture02);
+	glGenTextures(1, &tex02);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, texture02);
+	glBindTexture(GL_TEXTURE_2D, tex02);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -165,12 +130,12 @@ int exercises()
 	{
 		std::cout << "Failed to load texture" << std::endl;
 	}
-
 	stbi_image_free(data2);
 
-	our_shader_01.use(); // don't forget to activate the shader before setting uniforms!  
-	glUniform1i(glGetUniformLocation(our_shader_01.id(), "texture01"), 0); // set it manually
-	our_shader_01.setInt("texture02", 1); // or with shader class
+	our_shader_01.use(); // don't forget to activate the shader before setting uniforms!
+	// Why are these values passed in as just 1, I don't get what kind fo information is conveyed with this
+	our_shader_01.setInt("tex01", 1);
+	our_shader_01.setInt("tex02", 1);
 
 
 	while (!glfwWindowShouldClose(window))
@@ -181,9 +146,9 @@ int exercises()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture01);
+		glBindTexture(GL_TEXTURE_2D, tex01);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture02);
+		glBindTexture(GL_TEXTURE_2D, tex02);
 
 		our_shader_01.use();
 		glBindVertexArray(VAO[0]);
@@ -219,9 +184,7 @@ void gen_gl_objs(unsigned int *VAO, unsigned int *VBO) {
 void bind_gl_objs(unsigned int *VAO, unsigned int *VBO, float (&vertices)[32]) {
 	glBindVertexArray(VAO[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	std::cout << "size of &vertices: " << sizeof(&vertices) << std::endl;
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	std::cout << "size of vertices: " << sizeof(vertices) << std::endl;
 }
 
 void vert_attrib_pointer_config() {
@@ -236,7 +199,7 @@ void vert_attrib_pointer_config() {
 	glEnableVertexAttribArray(2);
 }
 
-void write_to_element_buffer(unsigned int *EBO, unsigned int *indices) {
+void write_to_element_buffer(unsigned int *EBO, unsigned int (&indices)[6]) {
 	glGenBuffers(1, EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
