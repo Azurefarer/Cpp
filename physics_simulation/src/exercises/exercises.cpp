@@ -15,8 +15,7 @@ static unsigned int SCR_HEIGHT = 1080;
 // GLSL source code
 // Moved into their own files, accessed by Shader_Class now
 
-int exercises()
-{
+int exercises() {
 	// glEnable(GL_DEBUG_OUTPUT);
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -24,8 +23,7 @@ int exercises()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
-	if (window == NULL)
-	{
+	if (window == NULL)	{
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 		return -1;
@@ -34,8 +32,7 @@ int exercises()
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
@@ -89,66 +86,57 @@ int exercises()
 	write_to_element_buffer(EBO, indices);
 
 	// Texture stuff
-	unsigned int tex01 = 0, tex02 = 0;
+	unsigned int texture01 = 0, texture02 = 0;
 	// texture 1
-	// ---------
-	glGenTextures(1, &tex01);
-	glBindTexture(GL_TEXTURE_2D, tex01);
-	// set the texture wrapping parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// set texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenTextures(1, &texture01);
+	glBindTexture(GL_TEXTURE_2D, texture01);
+	set_texture_params();
 	int width = 0, height = 0, nrChannels = 0;
 	unsigned char *data1 = stbi_load("../src/container.jpg", &width, &height, &nrChannels, 0);
-	if (data1)
-	{
+	if (data1) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data1);
 		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
+	} else {
 		std::cout << "Failed to load texture" << std::endl;
 	}
 	stbi_image_free(data1);
 
-	glGenTextures(1, &tex02);
+	glGenTextures(1, &texture02);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, tex02);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, texture02);
+	set_texture_params();
 	unsigned char* data2 = stbi_load("../src/awesomeface.png", &width, &height, &nrChannels, 0);
-	if (data2)
-	{
+	if (data2) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
 		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
+	} else {
 		std::cout << "Failed to load texture" << std::endl;
 	}
 	stbi_image_free(data2);
 
 	our_shader_01.use(); // don't forget to activate the shader before setting uniforms!
 	// Why are these values passed in as just 1, I don't get what kind fo information is conveyed with this
-	our_shader_01.setInt("tex01", 1);
-	our_shader_01.setInt("tex02", 1);
+	our_shader_01.setInt("texture01", 0); // needs to be a zero
+	if (our_shader_01.error()) {
+		std::cout << "texture01: " << "name does not correspond to an active uniform varible name" << std::endl;
+		return -1;
+	}
+	our_shader_01.setInt("texture02", 1);
+	if (our_shader_01.error()) {
+		std::cout << "texture02" << "name does not correspond to an active uniform varible name" << std::endl;
+		return -1;
+	}
 
-
-	while (!glfwWindowShouldClose(window))
-	{
+	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
 
 		glClearColor(0.0f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex01);
+		glBindTexture(GL_TEXTURE_2D, texture01);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, tex02);
+		glBindTexture(GL_TEXTURE_2D, texture02);
 
 		our_shader_01.use();
 		glBindVertexArray(VAO[0]);
@@ -157,6 +145,7 @@ int exercises()
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+	
 	std::cout << "out of while loop" << std::endl;
 	// glDeleteProgram(our_shader_01.id());
 	glDeleteVertexArrays(1, &VAO[0]);
@@ -169,6 +158,7 @@ int exercises()
 	return 0;
 }
 
+// Auxilliary fcts for readability
 void gen_gl_objs(unsigned int *VAO, unsigned int *VBO) {
 	// Safe, only throws error if the number of objs to gen is negative.
 	glGenVertexArrays(sizeof(VAO)/sizeof(VAO[0]), VAO);
@@ -203,4 +193,11 @@ void write_to_element_buffer(unsigned int *EBO, unsigned int (&indices)[6]) {
 	glGenBuffers(1, EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+}
+
+void set_texture_params() {
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }

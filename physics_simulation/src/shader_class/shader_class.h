@@ -66,37 +66,44 @@ public:
         }
     }
     // activate the shader
-    // ------------------------------------------------------------------------
-    void use()
-    {
+
+    void use() {
         glUseProgram(m_ID);
     }
     // utility uniform functions
-    // ------------------------------------------------------------------------
-    void setBool(const std::string& name, bool value) const
-    {
+
+    void setBool(const std::string& name, bool value) const {
         glUniform1i(glGetUniformLocation(m_ID, name.c_str()), (int)value);
     }
-    // ------------------------------------------------------------------------
-    void setInt(const std::string& name, int value) const
-    {
-        glUniform1i(glGetUniformLocation(m_ID, name.c_str()), value);
+
+    void setInt(const std::string& name, int value) {
+        if (glGetUniformLocation(m_ID, name.c_str()) == -1) {
+            m_error = true;
+        } else {
+            glUniform1i(glGetUniformLocation(m_ID, name.c_str()), value);
+        }
     }
-    // ------------------------------------------------------------------------
-    void setFloat(const std::string& name, float value) const
-    {
+
+    void setFloat(const std::string& name, float value) const {
         glUniform1f(glGetUniformLocation(m_ID, name.c_str()), value);
     }
+
     unsigned int id() const {
         return m_ID;
     }
+    
     bool ready() const {
         return m_ready;
+    }
+
+    bool error() const {
+        return m_error;
     }
 
 private:
     unsigned int m_ID = 1;
     bool m_ready = false;
+    bool m_error = false;
     void check_shader(unsigned int shader) {
         int param;
         glGetShaderiv(shader, GL_DELETE_STATUS, &param);
