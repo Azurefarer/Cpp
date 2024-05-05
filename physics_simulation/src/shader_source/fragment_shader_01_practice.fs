@@ -7,6 +7,6 @@ in vec3 UV;
 
 void main()
 {
-    FragColor = vec4(1.0, 1.0, 0.2, 1.0);
+    FragColor = vec4(0.2, 0.8863, 0.349, 1.0);
     // FragColor = mix(texture(Texture01, TexCoord), texture(Texture02, TexCoord), 0.5);
 }

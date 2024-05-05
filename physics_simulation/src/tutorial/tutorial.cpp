@@ -1,16 +1,14 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <shader_class/shader_class.h>
-#include <supplemental/supplemental.h>
+#include "tutorial/tutorial.h"
 #include <math.h>
 #include <iostream>
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+#include "user_input/user_input.h"
+#include "shader_class/shader_class.h"
 
 // settings
 static unsigned int SCR_WIDTH = 1920;
 static unsigned int SCR_HEIGHT = 1080;
-
-// GLSL source code
-// Moved into their own files, accessed by Shader_Class now
 
 int tutorial()
 {
@@ -125,5 +123,3 @@ int tutorial()
 	glfwTerminate();
 	return 0;
 }
-
-

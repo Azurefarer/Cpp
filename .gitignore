@@ -1,5 +1,4 @@
 build/
-/cmake-3.29.2-tutorial-source
 /.vscode
 /opencv
 .DS_Store
