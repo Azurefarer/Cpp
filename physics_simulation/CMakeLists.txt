@@ -83,5 +83,14 @@ target_link_libraries(physics_simulation PRIVATE shader)
 target_link_libraries(physics_simulation PRIVATE user_input)
 target_link_libraries(physics_simulation PRIVATE stb_image)
 
+if(APPLE)
+  target_link_libraries(physics_simulation PRIVATE
+    "-framework OpenGL"
+    "-framework Cocoa" 
+    "-framework IOKit"
+    "-framework CoreVideo"
+  )
+endif()
+
 # neccessary compile features to compile(basically like the version of the compiler)
 # target_compile_features(physics_simulation PRIVATE cxx_std_17)
