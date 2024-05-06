@@ -56,8 +56,7 @@ target_include_directories(shader PUBLIC
   src
   ${glfw3_SOURCE_DIR}/include
 )
-target_link_libraries(shader PUBLIC glad)
-target_link_libraries(shader PUBLIC ${PROJECT_SOURCE_DIR}/build/_deps/glfw3-build/src/libglfw3.a)
+target_link_libraries(shader PUBLIC glad glfw)
 
 add_library(user_input
   ${PROJECT_SOURCE_DIR}/src/user_input/user_input.cpp
@@ -67,8 +66,7 @@ target_include_directories(user_input PUBLIC
   src
   ${glfw3_SOURCE_DIR}/include
 )
-target_link_libraries(user_input PUBLIC glad)
-target_link_libraries(user_input PUBLIC ${PROJECT_SOURCE_DIR}/build/_deps/glfw3-build/src/libglfw3.a)
+target_link_libraries(user_input PUBLIC glad glfw)
 
 add_executable(physics_simulation 
   ${PROJECT_SOURCE_DIR}/src/apps/main/main.cpp
